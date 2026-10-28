@@ -1,0 +1,16 @@
+# ARC-AGI-3 Hexactinellid Agent: Pinned Dependencies
+# Python: >=3.10, <=3.12
+# Reconcile with the exact pip installs at the top of the competition kernel
+# coralfil/hexactinellid-spicule-lattice-arc3 before zipping; the Kaggle offline
+# runtime must not need anything beyond the attached model + these packages.
+torch>=2.4.0
+transformers>=4.43.0,<=4.46.0
+accelerate>=0.34.0
+numpy>=1.26.0,<2.0.0
+scipy>=1.11.0
+safetensors>=0.4.0
+autoawq==0.2.6
+vllm>=0.6.0
+networkx>=3.2
+arc-agi==0.3.0
+arcengine==0.1.0

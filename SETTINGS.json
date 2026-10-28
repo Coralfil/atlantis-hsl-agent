@@ -1,0 +1,10 @@
+{
+  "COMPETITION_DATA_DIR": "/kaggle/input/arc-prize-2026-arc-agi-3",
+  "ATTACHED_MODEL_PATH": "/kaggle/input/atlantis-pyramid-v2/transformers/14b-awq-int4/2",
+  "MODEL_DIR": "/kaggle/input/atlantis-pyramid-v2/transformers/14b-awq-int4/2",
+  "WORKING_DIR": "/kaggle/working",
+  "LOG_DIR": "/kaggle/working/failure_replay_digests",
+  "SUBMISSION_DIR": "/kaggle/working",
+  "MAX_BEAMS": 64,
+  "MAX_MODEL_LEN": 8192
+}

@@ -1,0 +1,16 @@
+.
+./competitions
+./competitions/arc_prize_2026
+./competitions/arc_prize_2026/dsl_primitives.py
+./competitions/arc_prize_2026/feature_extractor.py
+./competitions/arc_prize_2026/spicule_lattice.py
+./competitions/arc_prize_2026/latent_world_model.py
+./competitions/arc_prize_2026/llm_synthesizer.py
+./competitions/arc_prize_2026/hexactine_arc_agent.py
+./competitions/arc_prize_2026/official_adapter.py
+./competitions/arc_prize_2026/benchmark_runner.py
+./competitions/arc_prize_2026/submission_notebook.ipynb
+./competitions/arc_prize_2026/kernel-metadata.json
+./docs
+./docs/METHODOLOGY_HEXACTINELLID_LATTICE.md
+./docs/failure_replay_digests
