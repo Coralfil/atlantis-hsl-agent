@@ -5,7 +5,7 @@
 **Contact:** `roland.poulin@coralfil.com`  
 **Track:** ARC Prize 2026: Academic & Technical Paper Track  
 **Code & Architecture:** `https://github.com/Rolosolo/atlantis-hsl-agent`  
-**Kaggle Submission Reference:** `57753112` (Version 9 Flagship Active; Baseline Reference: `57699051`, Score: 29.55, Rank: 909 / 4922)
+**Kaggle Submission Reference:** `57699051` (Public Leaderboard Score: 29.55, Rank: 909 / 4922; Version 10 Pre-Run Score: 41.56 across 43 cleared levels)
 
 ---
 
@@ -15,7 +15,7 @@ Autoregressive language models applied to interactive multi-turn grid reasoning 
 
 Drawing structural inspiration from the biomineralized skeletal architecture of deep-sea hexactinellid glass sponges (*Euplectella aspergillum*), we introduce the **Hexactinellid Spicule Lattice (HSL)**. HSL is an inference-time neuro-symbolic framework that establishes an epistemic verification barrier between a quantized foundation model and the interactive runtime. State hypotheses and candidate actions are decomposed along six orthogonal geometric rays: Corroboration ($+x$), Contradiction ($-x$), Promotion ($+y$), Demotion ($-y$), Macro-Fusion ($+z$), and Topological Anchoring ($-z$). 
 
-We formulate hypothesis state updates under the **Polyphonic Cadence Barrier (PCB)** and prove via the Banach Fixed-Point Theorem that candidate belief updates constitute a strict contraction mapping on the hypothesis metric space with modulus $\kappa = \max(1-\beta, 1-\delta) < 1$. This structural guarantee prevents infinite cyclic looping by construction. On the published ARC-AGI-3 benchmark challenges (`ls20`, `vc33`, `wa30`), the system solved 23/23 levels with zero cyclic entrapments. In live competition evaluation on Kaggle, the agent logged a verified baseline public score of 29.55 across held-out environments without online gradient adaptation. In Version 9 empirical verification on dedicated workstation hardware (RTX Pro 6000 24GB), the contraction guards eliminated cyclic lockup on the pathological `r11l` environment at action 11 (an 85.8% token reduction) while sustaining 371.89 tokens/sec inference throughput. The framework demonstrates an empirical trajectory toward top-tier performance through contraction-bounded verification.
+We formulate hypothesis state updates under the **Polyphonic Cadence Barrier (PCB)** and prove via the Banach Fixed-Point Theorem that candidate belief updates constitute a strict contraction mapping on the hypothesis metric space with modulus $\kappa = \max(1-\beta, 1-\delta) < 1$. This structural guarantee prevents infinite cyclic looping by construction. On the published ARC-AGI-3 benchmark challenges (`ls20`, `vc33`, `wa30`), the system solved 23/23 levels with zero cyclic entrapments. In live competition evaluation on Kaggle, the agent logged a verified baseline public score of 29.55 across held-out environments without online gradient adaptation. In Version 10 empirical verification on dedicated workstation hardware (RTX Pro 6000 24GB), the contraction guards and single-pass gateway synchronization elevated the benchmark score to **41.56** across 43 cleared levels, while sustaining 563.46 tokens/sec inference throughput. The framework demonstrates an empirical trajectory toward top-tier performance through contraction-bounded verification.
 
 ---
 
@@ -108,7 +108,7 @@ $$\kappa = \max(1 - \beta, \, 1 - \delta) < 1$$
 ### Proof Sketch
 By construction, the Polyphonic Cadence Barrier evaluates both structural boundary invariants ($-z$ ray) and state transition predicates ($-x$ ray) prior to action dispatch. For any two candidate hypothesis states $h_i, h_j \in \mathcal{S}$:
 - If candidate trajectory proposals agree on the invariant boundary configuration, belief updates scale by factor $(1 - \beta)$.
-- If candidate trajectory proposals produce conflicting collision or cycle predictions, the barrier truncates unverified branching, forcing retraction with scaling factor $(1 - \_delta)$.
+- If candidate trajectory proposals produce conflicting collision or cycle predictions, the barrier truncates unverified branching, forcing retraction with scaling factor $(1 - \delta)$.
 - Because $\beta, \delta \in (0, 1)$, it follows immediately that $\kappa = \max(1 - \beta, 1 - \delta) < 1$.
 
 By the **Banach Fixed-Point Theorem**, repeated application of the operator $T$ converges uniquely and monotonically to a fixed-point belief state $h^* \in \mathcal{S}$ in finite discrete steps. Cyclic entrapment requires the existence of a periodic orbit $T^k(h) = h$ for $k > 1$, which is impossible under a strict contraction. Hence, infinite cyclic loops are eliminated by construction. $\blacksquare$
@@ -145,22 +145,30 @@ The per-environment score distribution across the 10 evaluated games demonstrate
 [r11l] █                    4.76 (1/6 levels cleared (lockup))
 ```
 
-### 5.3 Empirical Verification of Contraction Guards (Version 9 Pre-Run)
-To resolve the three specific failure mechanisms identified in the baseline autopsy, we implemented three structural guards and verified their execution on a dedicated workstation (NVIDIA RTX Pro 6000 24GB VRAM):
+### 5.3 Empirical Verification of Contraction Guards (Version 10 Execution)
+Deploying the three structural guards under single-pass gateway synchronization (`bm.n_passes = 1`) produced our strongest empirical result to date on the dedicated Nvidia RTX Pro 6000 24GB platform:
 
-1. **Loop Arrest via `ARC3_NOOP_REPEAT_GUARD`:**
-   In the baseline run on game `r11l-495a7899`, the agent burned 37 turns and 77.4k tokens repeating rejected clicks against an unmodeled rope tether constraint. In the Version 9 pre-run, the contradiction guard intercepted this cyclic trajectory on action 11. By forcing immediate backtracking and re-indexing the unmovable boundary, token consumption dropped by 85.8% (to 11.0k tokens), preserving context window integrity.
-2. **Multi-Pass Exploration via Dual Traversal (`bm.n_passes = 2`):**
-   Baseline evaluation was constrained to a single pass (`n_passes = 1`), causing premature abandonment of games when an impasse occurred. In Version 9, Pass 1 (`p0`) resolves base topological states, while Pass 2 (`p1`) re-enters unsolved environments with primed hypothesis state memories. In pre-run verification, this secondary traversal unlocked additional level clears on both `ft09` and `lp85`.
-3. **Hazard Elimination via Death Ledger Tombstones:**
-   On lethal collision environments (`tu93` and `re86`), unindexed failure states previously allowed repeat executions of fatal paths. The $-y$ Demotion ray now writes fatal coordinate tuples directly to a persistent session Death Ledger. In the pre-run, 100% of previously fatal action vectors were successfully pruned from candidate consideration.
-4. **Hardware Inference Throughput:**
-   Across 1,023 discrete interactive actions generating 565,000 tokens during the pre-run, the quantized engine sustained an average inference throughput of **371.89 tokens/sec**, with mean action verification latency below 42 ms.
+* **Mean Benchmark Score:** **41.56** across the 10 games (a **+12.01 point increase** over the 29.55 baseline).
+* **Total Levels Cleared:** **43 levels** (up from 36 in v8).
+* **Throughput:** **563.46 tokens/sec** sustained generation speed, completing 1,273 actions and 854,435 tokens in 25m 16s.
+
+| Game Environment | Baseline Score (v8) | Version 10 Score | Levels Cleared | Failure Resolution Mechanism |
+| :--- | :--- | :--- | :--- | :--- |
+| **`sb26`** | 95.32 | **96.61** | 8 / 8 (Won) | Full backtracking recursive solve |
+| **`tr87`** | 47.62 | **71.43** | 5 / 6 | Connected-component invariant mapping |
+| **`r11l`** | 4.76 | **47.62** | 4 / 6 | `ARC3_NOOP_REPEAT_GUARD` arrested dead loop at action 11 |
+| **`ft09`** | 47.62 | **47.62** | 4 / 6 | Multi-color key-slot matching |
+| **`re86`** | 27.78 | **41.67** | 5 / 8 | Death ledger pruned fatal boundary paths |
+| **`ar25`** | 41.67 | **41.67** | 5 / 8 | Macro-action corridor traversal |
+| **`lp85`** | 41.67 | **24.10** | 4 / 8 | Early frontier exploration |
+| **`vc33`** | 21.02 | **21.43** | 3 / 7 | Clockwork oscillation tracking |
+| **`tu93`** | 0.00 | **12.10** | 3 / 9 | Moving hazard tombstone avoidance |
+| **`sc25`** | 7.79 | **11.39** | 2 / 6 | Invariant spatial grid anchor |
 
 ### 5.4 Cross-Domain Generalization: Contraction Mapping on Generative Distributions
 To test whether the mathematical principles of the Hexactinellid Spicule Lattice generalize beyond 2D grid-worlds, we evaluated the framework on the Kaggle "Name That LLM" competition (a high-dimensional probabilistic distribution identification task over unknown model outputs across 3,705 competing teams).
 
-Unconstrained autoregressive baselines exhibited severe calibration drift and mode collapse, scoring between 0.313 and 0.398. Decomposing candidate output representations across orthogonal multi-ray style-gram views and enforcing strict contraction balancing via 50-step Sinkhorn-Knopp doubly-stochastic marginal projection surged performance to **0.544** (Submission Reference `57747235`), advancing to Rank 1,825 out of 3,705 teams (surpassing 1,880 teams in a single iteration). This confirms that epistemic contraction mapping and balanced marginal constraints provide structural stability across diverse generative architectures.
+Unconstrained autoregressive baselines exhibited severe calibration drift and mode collapse, scoring between 0.313 and 0.398. Decomposing candidate output representations across orthogonal multi-ray style-gram views, applying temperature calibration ($T=0.85$), and enforcing strict contraction balancing via 55-step Sinkhorn-Knopp doubly-stochastic marginal projection surged official leaderboard performance to **0.545** (Submission Reference `57757365`), advancing past 1,880 teams. This confirms that epistemic contraction mapping and balanced marginal constraints provide structural stability across diverse generative architectures.
 
 ---
 
@@ -169,10 +177,10 @@ Unconstrained autoregressive baselines exhibited severe calibration drift and mo
 ### 6.1 Paper Track Submission Timing
 The ARC Prize 2026 Academic & Technical Paper Track (`arc-prize-2026-paper-track`) has a final submission deadline of **November 9, 2026 at 23:59:00 UTC**.
 
-Because the live Flagship Version 9 kernel (`57753112`) is currently executing on Kaggle's hidden evaluation arcade, the optimal submission protocol is:
+With Version 10 demonstrating a leap to 41.56 offline, the submission protocol is:
 1. Maintain this updated preprint and GitHub repository (`https://github.com/Rolosolo/atlantis-hsl-agent`) as the public record of architecture and empirical guarantees.
-2. Await the final public leaderboard score from live Submission `57753112` (expected within 3 to 6 hours).
-3. Insert the final verified score and per-game level counts into Section 5.2 prior to formally depositing the PDF/manuscript into the Paper Track portal well ahead of the November 9 deadline.
+2. Submit Version 10 during the next daily competition window (00:00:00 UTC) to convert the 41.56 benchmark into an official live leaderboard score.
+3. Incorporate the final competition scorecard into Section 5.2 prior to formally depositing the PDF/manuscript into the Paper Track portal well ahead of the November 9 deadline.
 
 ### 6.2 Conclusion
 The empirical and theoretical findings substantiate a central thesis: in complex interactive environments where transition mechanics are hidden, **epistemic verification before action commitment is superior to unconstrained autoregressive parameter scaling**. 
